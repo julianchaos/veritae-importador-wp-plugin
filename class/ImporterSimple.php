@@ -74,7 +74,7 @@ class ImporterSimple extends Importer{
 				'post_date' => $this->BRDateToSystem($item['data']),
 				'post_title' => utf8_encode($item['titulo']),
 				'meta_input' => array(
-					'nivel_acesso' => $item['acesso'],
+					'nivel_acesso' => $item['acesso'], //Falta definir semelhança entre base antiga e nova
 					'tipo_postagem' => $tipo,
 					'titulo_alternativo' => utf8_encode($item['titulo']),
 					'arquivo' => null, //Deve inserir o arquivo
@@ -89,25 +89,6 @@ class ImporterSimple extends Importer{
 					$post['tax_input'] = array($item['area']);
 					break;
 			}
-			$this->insertPost($post);
-			break;
-		}
-	}
-	
-	
-	
-	private function importMaterias($materias) {
-		foreach($materias as $materia) {
-			$post = array(
-				'post_date' => $this->BRDateToSystem($materia['data']),
-				'post_title' => $materia['titulo'],
-				'meta_input' => array(
-					'nivel_acesso' => $materia['acesso'],
-					'tipo_postagem' => 'materia',
-					'titulo_alternativo' => $materia['titulo'],
-					'arquivo' => null, //Deve inserir o arquivo
-				)
-			);
 			$this->insertPost($post);
 		}
 	}
