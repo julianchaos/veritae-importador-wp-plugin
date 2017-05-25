@@ -19,6 +19,7 @@ Class VeritaeImportador {
 	function include_after_theme() {
 		include_once('class/Importer.php');
 		include_once('class/ImporterSimple.php');
+		include_once 'class/ImporterLex.php';
 	}
 	
 	public function init() {
