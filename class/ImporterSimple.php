@@ -22,8 +22,14 @@ class ImporterSimple extends Importer{
 
 	function admin_menu() {
 		// add page
-		add_submenu_page('edit.php?post_type=veritae-importador', __('Importador Simples','veritae'), __('Importador Simples','veritae'), 'manage_options', 'veritae-simple', array($this,'init'));
-
+		add_submenu_page(
+				'edit.php?post_type=veritae-importador',
+				__('Importador Simples','veritae'),
+				__('Importador Simples','veritae'), 
+				'manage_options', 
+				'veritae-simple', 
+				array($this,'init')
+			);
 	}
 
 	function init() {
@@ -74,23 +80,46 @@ class ImporterSimple extends Importer{
 				'post_date' => $this->BRDateToSystem($item['data']),
 				'post_title' => utf8_encode($item['titulo']),
 				'meta_input' => array(
-					'nivel_acesso' => $item['acesso'], //Falta definir semelhança entre base antiga e nova
-					'tipo_postagem' => $tipo,
+//					'tipo_postagem' => $tipo, //taxonomy
+//					'area_conhecimento' => array(), //taxonomy
 					'titulo_alternativo' => utf8_encode($item['titulo']),
+//					'tipo_ato' => array(), //taxonomy
+					'numero_ato' => null,
+					'informacoes_ato' => null,
+					'ementa' => null,
+					'tipo_arquivo' => 'remoto',
 					'arquivo' => null, //Deve inserir o arquivo
+					'arquivo_url' => null, //Deve inserir o arquivo
+					'fonte' => null,
+					'data_fonte' => null,
+					'autor_artigo' => null
+				),
+				'tax_input' => array(
+					'tipo_postagem' => $tipo,
+					'area_conhecimento' => array(),
+//					'tipo_ato' => array(),
 				)
 			);
 			
 			switch($tipo) {
 				case 'artigo':
-					$post['autor_artigo'] = $item['autor'];
+					$post['meta_input']['arquivo_url'] = "http://www.veritae.com.br/artigos/arquivos/{$item['anexo']}";
+					$post['meta_input']['autor_artigo'] = $item['autor'];
+					break;
+				case 'materia': 
+					$post['meta_input']['arquivo_url'] = "http://www.veritae.com.br/artigos/arquivos/" . $this->clearMateriaAnexo($item['anexo']);
 					break;
 				case 'noticia':
-					$post['tax_input'] = array($item['area']);
+					$post['tax_input']['area_conhecimento'][] = $item['area'];
+					$post['meta_input']['arquivo_url'] = "http://www.veritae.com.br/noticias/arquivos/{$item['anexo']}";
 					break;
 			}
 			$this->insertPost($post);
 		}
+	}
+	private function clearMateriaAnexo($anexo) {
+		$output = str_replace("../materias/arquivos/", '', $anexo);
+		return $output;
 	}
 
 }
