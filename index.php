@@ -39,8 +39,7 @@ Class VeritaeImportador {
 		));
 		
 		// admin only
-		if( is_admin() )
-		{
+		if( is_admin() ) {
 			add_action('admin_menu', array($this,'admin_menu'));
 		}
 	}
@@ -48,33 +47,35 @@ Class VeritaeImportador {
 	{
 		add_menu_page(__("Importador Veritae",'veritae'), __("Importador Veritae",'veritae'), 'manage_options', 'edit.php?post_type=veritae-importador', array($this, 'import'), false, '80.025');
 	}
-	function import(){
-		$post = array(
-			'post_date' => '2017-01-01',
-			'post_title' => 'título',
-			'post_status' => 'publish',
-			'comment_status' => 'closed',
-			'tax_input' => array(
-				'area_conhecimento' => array('Teste', 'Saúde', 'Previdência'),	
-				'tipo_ato' => 'Muamba Brasileira',
-			),
-			'meta_input' => array(
-				'nivel_acesso' => 'assinante', //assinante|publico
-				'tipo_postagem' => 'jurisprudencia',
-				'titulo_alternativo' => 'título alterntivo',
-				'numero_ato' => '123',
-				'informações_ato' => 'informações do ato',
-				'ementa' => 'ementa do ato',
-				'arquivo' => null,
-				'fonte' => 'Fonte do texto',
-				'data_fonte' => '2017-01-05',
-				'autor_artigo' => 'autor do artigo'
-			)
-		);
+//	function import(){
+//		$post = array(
+//			'post_date' => '2017-01-01',
+//			'post_title' => 'título',
+//			'post_status' => 'publish',
+//			'comment_status' => 'closed',
+//			'tax_input' => array(
+//				'tipo_postagem' => 'lex',
+//				'area_conhecimento' => array('Teste', 'Saúde', 'Previdência'),	
+//				'tipo_ato' => 'Muamba Brasileira',
+//			),
+//			'meta_input' => array(
+//				'nivel_acesso' => 'assinante', //assinante|publico
+//				'tipo_postagem' => 'jurisprudencia',
+//				'titulo_alternativo' => 'título alterntivo',
+//				'numero_ato' => '123',
+//				'informações_ato' => 'informações do ato',
+//				'ementa' => 'ementa do ato',
+//				'arquivo' => null,
+//				'fonte' => 'Fonte do texto',
+//				'data_fonte' => '2017-01-05',
+//				'autor_artigo' => 'autor do artigo'
+//			)
+//		);
 //		$error = wp_insert_post($post, true);
 //		var_dump($error);
-	}
+//	}
 }
+
 function initVeritaeImportador() {
 	global $veritaeImportador;
 	
