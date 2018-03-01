@@ -15,7 +15,14 @@ class Importer {
 	public $_conn = null;
 	
 	public function __construct() {
-		$this->_conn = mysqli_connect("localhost", "root", "", 'ndrade_veritae_old');
+		$server = "localhost";
+		$user = "pma";
+		$pw = "";
+		$database = "simulacaovirtual_veritae_old";
+		
+		include "connection.override";
+		
+		$this->_conn = mysqli_connect($server, $user, $pw, $database) or die('Erro ao conectar à base de importação');
 	}
 	protected function BRDateToSystem($date) {
 		$splitted = explode("/", $date);
@@ -29,6 +36,19 @@ class Importer {
 		}
 		
 		return $item;
+	}
+	
+	protected function getTerm($search_by, $name, $tax) {
+		$term = get_term_by($search_by, $name, $tax, 'ARRAY_A');
+		
+		if(!is_array($term)) {
+			$term = wp_insert_term($name, $tax);
+		}
+		
+		if(is_array($term)) {
+			return $term['term_id'];
+		}
+		return null;
 	}
 	
 	protected function insertPost($post) {
