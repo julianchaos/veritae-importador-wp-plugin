@@ -11,7 +11,7 @@
  *
  * @author julianchaos
  */
-class ImporterSimple extends Importer{
+class ImporterSimple extends Importer {
 
 	function __construct() {
 		parent::__construct();
@@ -24,31 +24,45 @@ class ImporterSimple extends Importer{
 		// add page
 		add_submenu_page(
 				'edit.php?post_type=veritae-importador',
-				__('Importador Simples','veritae'),
-				__('Importador Simples','veritae'), 
+				__('Importador Artigos','veritae'),
+				__('Importador Artigos','veritae'), 
 				'manage_options', 
-				'veritae-simple', 
-				array($this,'init')
+				'veritae-simple-artigos', 
+				array($this,'runImportArtigos')
+			);
+		add_submenu_page(
+				'edit.php?post_type=veritae-importador',
+				__('Importador Matérias','veritae'),
+				__('Importador Matérias','veritae'), 
+				'manage_options', 
+				'veritae-simple-materias', 
+				array($this,'runImportMaterias')
+			);
+		add_submenu_page(
+				'edit.php?post_type=veritae-importador',
+				__('Importador Notícias','veritae'),
+				__('Importador Notícias','veritae'), 
+				'manage_options', 
+				'veritae-simple-noticias', 
+				array($this,'runImportNoticias')
 			);
 	}
 
-	function init() {
-		echo 'init importer simple';
+	public function runImportArtigos() {
+		echo __METHOD__;
 
-		$this->runImportArtigos();
-		$this->runImportMaterias();
-		$this->runImportNoticias();
-	}
-
-	private function runImportArtigos() {
 		$artigos = $this->loadArtigos();
 		$this->importSimplePost($artigos, 'artigo');
 	}
-	private function runImportMaterias() {
+	public function runImportMaterias() {
+		echo __METHOD__;
+		
 		$materias = $this->loadMaterias();
 		$this->importSimplePost($materias, 'materia');
 	}
-	private function runImportNoticias() {
+	public function runImportNoticias() {
+		echo __METHOD__;
+
 		$noticias = $this->loadNoticias();
 		$this->importSimplePost($noticias, 'noticia');
 	}
@@ -80,8 +94,8 @@ class ImporterSimple extends Importer{
 				'post_date' => $this->BRDateToSystem($item['data']),
 				'post_title' => utf8_encode($item['titulo']),
 				'meta_input' => array(
-//					'tipo_postagem' => $tipo, //taxonomy
-//					'area_conhecimento' => array(), //taxonomy
+					'tipo_postagem' => $this->getTerm('slug', $tipo, 'tipo_postagem'), //taxonomy
+					'area_conhecimento' => array(), //taxonomy
 					'titulo_alternativo' => utf8_encode($item['titulo']),
 //					'tipo_ato' => array(), //taxonomy
 					'numero_ato' => null,
@@ -110,6 +124,7 @@ class ImporterSimple extends Importer{
 					$post['meta_input']['arquivo_url'] = "http://www.veritae.com.br/artigos/arquivos/" . $this->clearMateriaAnexo($item['anexo']);
 					break;
 				case 'noticia':
+					$post['meta_input']['area_conhecimento'][] = $this->getTerm('name', $item['area'], 'area_conhecimento');
 					$post['tax_input']['area_conhecimento'][] = $item['area'];
 					$post['meta_input']['arquivo_url'] = "http://www.veritae.com.br/noticias/arquivos/{$item['anexo']}";
 					break;
