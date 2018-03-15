@@ -12,11 +12,14 @@ Copyright: Julian Andrade
 
 Class VeritaeImportador {
 	public function __construct() {
-		add_action('init', array($this, 'init'), 1);
-		add_action('after_setup_theme', array($this, 'include_after_theme'), 1);
+		if( is_admin() ) {
+			add_action('init', array($this, 'init'), 1);
+			add_action('after_setup_theme', array($this, 'include_after_theme'), 1);
+			add_action('plugins_loaded', array($this, 'enqueue_script'), 1);
+		}
 	}
 	
-	function include_after_theme() {
+	public function include_after_theme() {
 		include_once('class/Importer.php');
 		include_once('class/ImporterSimple.php');
 		include_once 'class/ImporterLex.php';
@@ -38,42 +41,17 @@ Class VeritaeImportador {
 			'show_in_menu'	=> false,
 		));
 		
-		// admin only
-		if( is_admin() ) {
-			add_action('admin_menu', array($this,'admin_menu'));
-		}
+		add_action('admin_menu', array($this,'admin_menu'));
 	}
-	function admin_menu()
-	{
+	function admin_menu() {
 		add_menu_page(__("Importador Veritae",'veritae'), __("Importador Veritae",'veritae'), 'manage_options', 'edit.php?post_type=veritae-importador', array($this, 'import'), false, '80.025');
 	}
-//	function import(){
-//		$post = array(
-//			'post_date' => '2017-01-01',
-//			'post_title' => 'título',
-//			'post_status' => 'publish',
-//			'comment_status' => 'closed',
-//			'tax_input' => array(
-//				'tipo_postagem' => 'lex',
-//				'area_conhecimento' => array('Teste', 'Saúde', 'Previdência'),	
-//				'tipo_ato' => 'Muamba Brasileira',
-//			),
-//			'meta_input' => array(
-//				'nivel_acesso' => 'assinante', //assinante|publico
-//				'tipo_postagem' => 'jurisprudencia',
-//				'titulo_alternativo' => 'título alterntivo',
-//				'numero_ato' => '123',
-//				'informações_ato' => 'informações do ato',
-//				'ementa' => 'ementa do ato',
-//				'arquivo' => null,
-//				'fonte' => 'Fonte do texto',
-//				'data_fonte' => '2017-01-05',
-//				'autor_artigo' => 'autor do artigo'
-//			)
-//		);
-//		$error = wp_insert_post($post, true);
-//		var_dump($error);
-//	}
+	
+	public function enqueue_script() {
+		wp_register_script('veritae-importador-js', plugin_dir_url(__FILE__) . "js/veritae-importador.js", array('jquery'));
+		wp_localize_script('veritae-importador-js', 'veritae_importador_src', array('ajaxurl' => admin_url( 'admin-ajax.php' )));
+		wp_enqueue_script('veritae-importador-js');
+	}
 }
 
 function initVeritaeImportador() {

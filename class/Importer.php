@@ -13,6 +13,7 @@
  */
 class Importer {
 	public $_conn = null;
+	public $_error = [];
 	
 	public function __construct() {
 		$server = "localhost";
@@ -26,13 +27,23 @@ class Importer {
 	}
 	protected function BRDateToSystem($date) {
 		$splitted = explode("/", $date);
-		
-		$return = "{$splitted[2]}-" . $this->normalizeDateItem($splitted[1]) . "-" . $this->normalizeDateItem($splitted[0]);
+
+		$return = $this->normalizeYearItem($splitted[2]) . "-" . $this->normalizeDateItem($splitted[1]) . "-" . $this->normalizeDateItem($splitted[0]);
 		return $return;
 	}
 	private function normalizeDateItem($item) {
 		if(strlen($item) === 1) {
 			return ("0" . $item);
+		}
+		if(strlen($item) === 3) {
+			return substr($item, 1, 2);
+		}
+
+		return $item;
+	}
+	private function normalizeYearItem($item) {
+		if(strlen($item) === 2) {
+			return ("20" . $item);
 		}
 		
 		return $item;
@@ -55,10 +66,7 @@ class Importer {
 		$post['post_status'] = 'publish';
 		$post['comment_status'] = 'closed';
 		
-		echo "<pre>";
 		$error = wp_insert_post($post, true);
-		var_dump($error);
-		var_dump($post);
-		echo "</pre>";
+		return $error;
 	}
 }

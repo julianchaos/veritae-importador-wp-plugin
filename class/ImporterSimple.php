@@ -18,6 +18,10 @@ class ImporterSimple extends Importer {
 
 		// actions
 		add_action('admin_menu', array($this,'admin_menu'), 11, 0);
+
+		add_action('wp_ajax_veritae_importador_artigos', array($this, 'post_importArtigos'));
+		add_action('wp_ajax_veritae_importador_materias', array($this, 'post_importMaterias'));
+		add_action('wp_ajax_veritae_importador_noticias', array($this, 'post_importNoticias'));
 	}
 
 	function admin_menu() {
@@ -49,34 +53,75 @@ class ImporterSimple extends Importer {
 	}
 
 	public function runImportArtigos() {
-		echo __METHOD__;
-
-		$artigos = $this->loadArtigos();
-		$this->importSimplePost($artigos, 'artigo');
+				echo <<<EOD
+<script>
+	jQuery(function () {
+		jQuery.veritae_importador.import_artigos();
+	});
+</script>
+EOD;
 	}
-	public function runImportMaterias() {
-		echo __METHOD__;
+	public function post_importArtigos() {
+		$start = filter_input(INPUT_POST, 'start', FILTER_SANITIZE_NUMBER_INT);
+		$interval = filter_input(INPUT_POST, 'interval', FILTER_SANITIZE_NUMBER_INT);
 		
-		$materias = $this->loadMaterias();
-		$this->importSimplePost($materias, 'materia');
-	}
-	public function runImportNoticias() {
-		echo __METHOD__;
+		$artigos = $this->loadArtigos($start, $interval);
+		$this->importSimplePost($artigos, 'artigo');
 
-		$noticias = $this->loadNoticias();
-		$this->importSimplePost($noticias, 'noticia');
+		die(json_encode(array('size' => count($artigos), 'error' => $this->_error) ));
+	}
+
+	public function runImportMaterias() {
+				echo <<<EOD
+<script>
+	jQuery(function () {
+		jQuery.veritae_importador.import_materias();
+	});
+</script>
+EOD;
+	}
+	public function post_importMaterias() {
+		$start = filter_input(INPUT_POST, 'start', FILTER_SANITIZE_NUMBER_INT);
+		$interval = filter_input(INPUT_POST, 'interval', FILTER_SANITIZE_NUMBER_INT);
+		
+		$materias = $this->loadMaterias($start, $interval);
+		$this->importSimplePost($materias, 'materia');
+		
+		die(json_encode(array('size' => count($materias), 'error' => $this->_error) ));
 	}
 	
-	private function loadArtigos() {
-		$query = "SELECT * FROM artigos";
+	public function runImportNoticias() {
+				echo <<<EOD
+<script>
+	jQuery(function () {
+		jQuery.veritae_importador.import_noticias();
+	});
+</script>
+EOD;
+	}
+	public function post_importNoticias() {
+		$start = filter_input(INPUT_POST, 'start', FILTER_SANITIZE_NUMBER_INT);
+		$interval = filter_input(INPUT_POST, 'interval', FILTER_SANITIZE_NUMBER_INT);
+
+		$noticias = $this->loadNoticias($start, $interval);
+		$this->importSimplePost($noticias, 'noticia');
+		
+		die(json_encode(array('size' => count($noticias), 'error' => $this->_error) ));
+	}
+	
+	private function loadArtigos($start, $interval) {
+		$query = "SELECT * FROM artigos "
+				. "ORDER BY id DESC LIMIT $start, $interval";
 		return $this->buildPostList($query);
 	}
-	private function loadMaterias(){
-		$query = "SELECT * FROM materias";
+	private function loadMaterias($start, $interval){
+		$query = "SELECT * FROM materias "
+				. "ORDER BY id DESC LIMIT $start, $interval";
 		return $this->buildPostList($query);
 	}
-	private function loadNoticias() {
-		$query = "SELECT * FROM noticias";
+	private function loadNoticias($start, $interval) {
+		$query = "SELECT * FROM noticias "
+				. "ORDER BY id DESC LIMIT $start, $interval";
 		return $this->buildPostList($query);
 	}
 	private function buildPostList($query) {
@@ -129,7 +174,14 @@ class ImporterSimple extends Importer {
 					$post['meta_input']['arquivo_url'] = "http://www.veritae.com.br/noticias/arquivos/{$item['anexo']}";
 					break;
 			}
-			$this->insertPost($post);
+			
+			$response = $this->insertPost($post);
+			if(is_object($response)) {
+				$this->_error[] = [
+					'error' => $response->get_error_messages(),
+					'post' => $item['id'],
+				];
+			}
 		}
 	}
 	private function clearMateriaAnexo($anexo) {
