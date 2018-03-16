@@ -15,14 +15,30 @@ class ImporterLex extends Importer {
 	
 	function admin_menu() {
 		// add page
-		add_submenu_page('edit.php?post_type=veritae-importador', __('Importador Lex','veritae'), __('Importador Lex','veritae'), 'manage_options', 'veritae-lex', array($this,'init'));
+		add_submenu_page('edit.php?post_type=veritae-importador', __('Importador Lex (Previdência)','veritae'), __('Importador Lex (Previdência)','veritae'), 'manage_options', 'veritae-lex-previdencia', array($this,'init_previdencia'));
+		add_submenu_page('edit.php?post_type=veritae-importador', __('Importador Lex (SST)','veritae'), __('Importador Lex (SST)','veritae'), 'manage_options', 'veritae-lex-sst', array($this,'init_sst'));
+		add_submenu_page('edit.php?post_type=veritae-importador', __('Importador Lex (Trabalho)','veritae'), __('Importador Lex (Trabalho)','veritae'), 'manage_options', 'veritae-lex-trabalho', array($this,'init_trabalho'));
+		add_submenu_page('edit.php?post_type=veritae-importador', __('Importador Lex (Outros)','veritae'), __('Importador Lex (Outros)','veritae'), 'manage_options', 'veritae-lex-outros', array($this,'init_outros'));
 	}
 	
-	function init() {
+	public function init_previdencia() {
+		$this->init('previdencia');
+	}
+	public function init_sst() {
+		$this->init('sst');
+	}
+	public function init_trabalho() {
+		$this->init('trabalho');
+	}
+	public function init_outros() {
+		$this->init('outros');
+	}
+	
+	private function init($type) {
 		echo <<<EOD
 <script>
 	jQuery(function () {
-		jQuery.veritae_importador.import_lex();
+		jQuery.veritae_importador.import_lex('$type');
 	});
 </script>
 EOD;

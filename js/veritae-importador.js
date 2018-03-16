@@ -15,11 +15,8 @@ jQuery.veritae_importador = {
 	import_noticias: function(){
 		this.loop('veritae_importador_noticias');
 	},
-	import_lex: function(){
-		this.loop('veritae_importador_lex_previdencia');
-		this.loop('veritae_importador_lex_sst');
-		this.loop('veritae_importador_lex_trabalho');
-		this.loop('veritae_importador_lex_outros');
+	import_lex: function(type){
+		this.loop('veritae_importador_lex_' + type);
 	},
 	loop: function(action) {
 		console.log('started ' + action);
@@ -27,9 +24,6 @@ jQuery.veritae_importador = {
 		do {
 			this.send_request(action, this.import_data.start, this.import_data.interval);
 		} while (this.import_data.continue);
-		
-		this.import_data.start = 0;
-		this.import_data.continue = true;
 
 		console.log('finished ' + action);
 	},
